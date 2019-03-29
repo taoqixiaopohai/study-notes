@@ -1,0 +1,63 @@
+1.镜像
+	镜像是多个层叠式的只读文件；
+2.容器
+	容器 = 层叠只读文件 + 读写文件 （copy on write）;
+
+3.常用docker命令
+	service docker start -- 启动docker服务进程；
+	docker pull xxx -- 拉取xxx镜像；
+	docker run xxx -- 创建xxx容器；
+	docker stop xxx -- 停止xxx容器；
+	docker rm xxx -- 移除xxx容器；
+	docker rmi xxx -- 移除xxx镜像；
+	docker inspect xxx -- 查看xxx镜像信息
+	docker ps -- 查看正在运行的docker容器
+	docker cp xxx:yyy zzz -- 拷贝xxx容器yyy目录或者文件到宿主机的zzz	例如，docker cp nginx:/etc/nginx/nginx.conf /root/Docker/nginx/conf/nginx.conf（拷贝名称为nginx的容器的/etc/nginx/nginx.conf到宿主机的/root/Docker/nginx/conf/nginx.conf）
+	docker exec -it xxx /bin/bash  -- 进入xxx容器
+	docker logs -f xxx -- 查看xxx容器的日志
+4.常用docker容器启动参数
+	4.1启动postgresql容器(使用集成了postgis的镜像)
+		docker run --name postgresql -d -p 5432:5432 -v /root/Docker/postgresql/data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=pg123 -e POSTGRES_USER=postgres mdillon/postgis
+		--name 指定容器名称
+		-p 端口映射，冒号前为宿主机端口，冒号后为容器端口
+		-v 挂载容器目录到宿主机目录，冒号前为宿主机目录，冒号后为容器目录
+		-d 容器在后台运行
+		注意：
+			启动完容器后需要使用postgis：
+				CREATE EXTENSION postgis;
+				CREATE EXTENSION postgis_topology;
+	4.2启动nginx容器
+		docker run --name nginx -d -p 80:80 -v /root/Docker/nginx/conf:/etc/nginx/conf -v /root/Docker/nginx/html:/etc/nginx/html -v /mnt/data/nginx_data:/mnt/data/nginx_data nginx
+		注意：
+			如果 -v 挂载的为配置文件，则需要在启动之前手动在宿主机上创建对应文件；
+			在nginx.conf 中配置的路径为【nginx容器中的路径】；
+			
+	4.3启动tomcat容器
+		docker run --name tomcat -d -p 8080:8080 -v /root/Docker/tomcat/conf:/usr/local/tomcat/conf -v /root/Docker/tomcat/webapps:/usr/local/tomcat/webapps tomcat
+		注意：
+			如果 -v 挂载的为配置文件，则需要在启动之前手动在宿主机上创建对应文件(/root/Docker/tomcat/conf目录下放置server.xml文件)；
+			
+	4.4启动部署TDS服务的tomcat容器
+		docker run --name tomcat -d -p 8080:8080 -v /root/Docker/tomcat/conf:/usr/local/tomcat/conf -v /root/Docker/tomcat/webapps:/usr/local/tomcat/webapps -v /root/Docker/tomcat/bin/setenv.sh:/usr/local/tomcat/bin/setenv.sh -v /root/Docker/tomcat/content:/usr/local/tomcat/content -v /mnt/data/nc/LAPS3KM:/mnt/data/nc/LAPS3KM tomcat
+		注意：
+			如果 -v 挂载的为配置文件，则需要在启动之前手动在宿主机上创建对应文件(/root/Docker/tomcat/bin目录下放置setenv.sh)；
+			
+	4.5启动elasticsearch容器
+		docker run -d --name es -p 9200:9200 -p 9300:9300 -v /root/Docker/elasticsearch/config:/usr/share/elasticsearch/config -v /root/Docker/elasticsearch/data:/usr/share/elasticsearch/data -v /root/Docker/elasticsearch/logs:/usr/share/elasticsearch/logs elasticsearch		
+		
+	4.6启动elasticsearch插件kibana
+		docker run --name kibana --link es:elasticsearch -p 5601:5601 -d kibana	
+		注意：	
+			--link es:elasticsearch 中的es为已启动的elasticsearch容器的名称
+			
+	4.7启动elasticsearch插件elasticsearch-head
+		docker run -d --name es-head -p 9100:9100 -v /root/Docker/elasticsearch-head/Gruntfile.js:/usr/src/app/Gruntfile.js -v /root/Docker/elasticsearch-head/app.js:/usr/src/app/_site/app.js mobz/elasticsearch-head:5
+
+5.进入docker容器内部：
+	docker exec -it 775c7c9ee1e1 /bin/bash 
+	-it 申请控制台
+	
+6.查看docker容器日志
+	docker logs -f 775c7c9ee1e1
+	-f 实时监控
+		
