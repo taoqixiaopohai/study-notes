@@ -1,0 +1,123 @@
+﻿1.eclipse中快速删除注释：Ctrl + F 在find框中输入   /\*{1,2}[\s\S]*?\*/   勾选Regular expressions 单击Replace All
+2.启动或停止数据库服务的命令
+	mysql:
+		net start mysql
+		net stop mysql
+	postgresql
+		pg_ctl start
+		pg_ctl stop
+3.pg数据库常用命令：
+	(1).连接数据库：psql database userName passWord
+	(2).显示数据库中所有数据表：select * from pg_tables; -- 也可以登录数据库后使用命令\dt"
+	(3).查询表结构：select * from information_schema.columns where table_name = 'tableName'; -- 也可以\d tableName;
+	(4).备份数据表：pg_dump -h server -p port -U username -d database -f fileName -t tableName
+	(5).恢复数据表：psql -h server [-p port] -U userName -d database  -f fileDir
+	(6).退出postgresql数据库：\q;
+	(7).查看表的大小：select pg_size_pretty(pg_relation_size('tableName'));
+	(8).将cvs数据导入数据库：copy app_warr_disaster_mapping(warr_event_code,warr_event_name,disaster_type_code,disaster_type_name) from 'D:\1.csv' with (format csv,header false,quote '"',DELIMITER ',',encoding 'UTF_8');
+	(9).将数据库中数据导出到本地：-- copy [result] to ...
+		copy (select id,poi_code,poi_type,area_code from w_poi where area_code='0' ) to '/home/postgres/w_poi2.txt';
+	(10).create rule 语法：
+		CREATE [ OR REPLACE ] RULE name AS ON event TO table_name [ WHERE condition ] DO [ ALSO | INSTEAD ] { NOTHING | command | ( command ; command ... ) }
+			create or replace rule r_test as on insert to test where exists (select 1 from test where date_time = new.date_time and is_forcast = new.is_forcast) do instead nothing;
+			create or replace rule r_test as on insert to test where exists (select 1 from test where date_time = new.date_time and is_forcast = new.is_forcast) do instead update test set area_geom = new.area_geom where date_time = new.date_time and is_forcast = new.is_forcast;
+	(11).类似Mysql的 insert ignore 用法：
+		①.insert into table (field01,field02,...) select value01,value02,... from table where not exists (select 1 from table where field01 = value01 and field02 = value02 and ...) limit 1; -- 注意，一定要加limit
+			insert into test (date_time,is_forcast) select '2017-04-07 09:35:00','n' from test where not exists (select 1 from test where date_time = '2017-04-07 09:35:00' and is_forcast = 'n') limit 1;
+		②.create or replace rule ruleName as on insert to table where exists (select 1 from table where field01 = new.field01 and field02 = new.field02 and ...) do instead nothing;
+			create or replace rule r_test as on insert to test where exists (select 1 from test where date_time = new.date_time and is_forcast = new.is_forcast) do instead nothing;
+	(12).类似Mysql的 replace into 用法：
+		create or replace rule ruleName as on insert to table where exists (select 1 from table where field01 = new.field01 and field02 = new.field02 and ...) do instead update table set field01 = new.field01,field02 = new.field02, ... where field01 = new.field01 and field02 = new.field02 and ... ; -- 注意一定不能少了最后的where
+			create or replace rule r_test as on insert to test where exists (select 1 from test where date_time = new.date_time and is_forcast = new.is_forcast) do instead update test set area_geom = new.area_geom where date_time = new.date_time and is_forcast = new.is_forcast; -- 注意一定不能少了最后的where
+	(13).删除rule: drop rule if exists ruleName on table
+		drop rule if exists r_test on test;
+	(14).查看各数据库占磁盘空间：
+		SELECT
+			d.datname AS NAME,
+			pg_catalog.pg_get_userbyid (d.datdba) AS OWNER,
+			CASE
+		WHEN pg_catalog.has_database_privilege (d.datname, 'CONNECT') THEN
+			pg_catalog.pg_size_pretty (
+				pg_catalog.pg_database_size (d.datname)
+			)
+		ELSE
+			'No Access'
+		END AS SIZE
+		FROM
+			pg_catalog.pg_database d
+		ORDER BY
+			CASE
+		WHEN pg_catalog.has_database_privilege (d.datname, 'CONNECT') THEN
+			pg_catalog.pg_database_size (d.datname)
+		ELSE
+			NULL
+		END DESC -- nulls first
+		LIMIT 20;
+	(15).查看各数据表所占磁盘空间：
+		SELECT
+			table_schema || '.' || table_name AS table_full_name,
+			pg_size_pretty(pg_total_relation_size('"' || table_schema || '"."' || table_name || '"')) AS size
+		FROM information_schema.tables
+		ORDER BY
+			pg_total_relation_size('"' || table_schema || '"."' || table_name || '"') DESC
+	(16).使用to_char(datetime,format)格式化时间需注意format -- yyyy-MM-dd HH24:MI:SS 分钟为MI而非MM
+	(17).字符串转时间[without time zone]:
+		select to_timestamp('2011-12-30 00:30:00','YYYY-MM-DD HH24:MI:SS')::timestamp without time zone;
+	(18).批量备份数据表：
+		pg_dump -U username -d database -t table1 -t table2 -t table3 ...  > desFilePath	--这样导出来的多张表都在同一份文件中
+	(18).导入数据表：
+		psql -U username -d database < srcFilePath
+	(19).重置序列sequence起始值：
+		alter sequence sequenceName restart with x；如： alter sequence w_poi_detail_id_seq restart with 36513583;
+	(20).为表中已有字段添加序列：
+		alter table tableName alter column columnName set default nextval('sequenceName'); 如：	alter table w_poi alter column id set default nextval('w_poi_id_seq');
+	(21).ctid： 表示数据记录的物理行当信息，指的是 一条记录位于哪个数据块的哪个位移上面。 跟oracle中伪列 rowid 的意义一样的；只是形式不一样。
+	(22).generate_series(start,end,[step])为pg的内置函数，可以按照指定规则来产生一系列的填充数据，以便于测试。
+4.Linux 常用命令：
+	新建文件夹：mkdir dirname;
+	显示文件夹下子文件：ll;ll -t -- 按时间降序排列，ll -tr -- 按时间升序排列、
+	查看文件分页显示：ls | less
+	显示当前路径：pwd;
+	强制删除文件：rm -rf fileName[dirPath];
+	新建文件：touch fileName;
+	更改文件(夹)所有者：chown [-R] 账号名称 文件或目录 -- [-R] 递归(子资源传递)
+	更改文件夹所属组：chgrp [-R] 用户组名称 文件或目录
+	更改文件(夹)操作权限：chmod xxx 文件或目录；
+	保存并退出 esc ==> ":" ==> "x!" ==>回车;
+	不做任何修改退出：esc ==> ":" ==>"q!" ==>回车;
+	压缩文件：zip -r xxx.zip dirPath; -- -r 表示递归压缩文件夹下的所有资源
+	切换用户：su userName;
+	移动文件：mv 源文件 目标文件; --  将当前目录下所有文件移动到上一级目录：mv * ../
+	查看程序运行状态：ps -ef|grep 程序名称;
+	查看文件夹下子文件文件数目：ls -l |grep "^-"|wc -l (要先进入文件夹下)
+	查看文件夹大小：du -sh (要先进入文件夹下)
+	移动某个时间段内的文件到指定文件夹：find . -mmin -230 -mmin +60 -name '*' | xargs -I {} mv {} ../ -- 以当前时间为标准，将230分钟前至当前时间60分钟前(-230min~-60min)之内的文件移动到上一层目录
+	实时显示新追加的日志记录：tail -f logName
+	查看文件倒数100行内容：tail -n 100 fileName
+	查找文件内容：grep content fileName
+	统计目录下文件数量：ls -l |grep "^-"|wc -
+	linux服务器之间发送文件：scp local_file remote_username@remote_ip:remote_folder 例如：scp -P 12306 /tmp/station.sql eagle@10.161.232.231:/tmp/
+	linux服务器之间接收文件：scp -P port username@ip:desFilePath srcDir 例如：scp -P 12306 eagle@10.161.232.231:/mnt/ship_0611.zip /mnt/
+	根据PID查看程序绝对路径：通过ps命令查看程序PID，进入/proc/PID目录执行ls -all ，exe关联的链接即为程序绝对路径
+	使用vi编辑时，":nu"显示当前行号，":set nu"显示所有行号，":n"调到n行
+5.那些天坑
+	①.使用spring自带jdbc批量dml时，public int getBatchSize() 返回的数值必须是批量操作的集合或数组的大小才可以；
+	②.配置linux动态库路径的正确语法示例：export LD_LIBRARY_PATH="/var/tlq/TLQ8/lib:$LD_LIBRARY_PATH" -- 注意，一定不能少了引号
+
+6.redis
+	(1).批量删除符合指定规则的key(终端操作):
+		redis-cli -a pass(密码) keys "WX_ACT_USER_KEY_*"[符合规则的key] | xargs redis-cli -a pass(密码) del
+
+7.geoTools、JTS
+	(1).读取shape文件时，经常会报java.lang.IllegalArgumentException: Expected requestor org.geotools.data.shapefile.dbf.DbaseFileReader@4ea5b703 to have locked the url but it does not hold the lock for the URL
+		解决办法：
+			simpleFeatureIterator.close();
+			shapefileDataStore.dispose();
+8.maven手动打包
+	mvn clean package -Dmaven.test.skip=true
+  本地安装jar
+	mvn install:install-file -Dfile= -DgroupId= -DartifactId= -Dversion= -Dpackaging=jar
+	如：
+	mvn install:install-file -Dfile=E:\linkCM\tools\maven\repository\com\linkcm\typhoon-api-1.0.jar -DgroupId=com.linkcm -DartifactId=typhoon-api -Dversion=1.0 -Dpackaging=jar
+
+
