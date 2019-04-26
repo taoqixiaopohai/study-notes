@@ -35,14 +35,14 @@ export  JAVA_HOME=jdk安装路径
 + su hadoop	# 切换至hadoop用户
 + vim ~/.bashrc	# 配置hadoop环境变量，在文件的最后追加以下内容：
 ```
-	export HADOOP_HOME=/usr/local/hadoop
-	export HADOOP_INSTALL=$HADOOP_HOME
-	export HADOOP_MAPRED_HOME=$HADOOP_HOME
-	export HADOOP_COMMON_HOME=$HADOOP_HOME
-	export HADOOP_HDFS_HOME=$HADOOP_HOME
-	export YARN_HOME=$HADOOP_HOME
-	export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
-	export PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin
+export HADOOP_HOME=/usr/local/hadoop
+export HADOOP_INSTALL=$HADOOP_HOME
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+export PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin
 ```
 + source ~/.bashrc	# 使设置的环境变量立即生效
 
@@ -50,33 +50,33 @@ export  JAVA_HOME=jdk安装路径
 + vim /usr/local/hadoop/etc/hadoop/core-site.xml
 + 在`<configuration>`标签中插入以下内容：
 ```
-	<property>
-		<name>hadoop.tmp.dir</name>
-		<value>file:/usr/local/hadoop/tmp</value>
-		<description>Abase for other temporary directories.</description>
-	</property>
-	<property>
-		<name>fs.defaultFS</name>
-		<value>hdfs://localhost:9000</value>
-	</property>
+    <property>
+	<name>hadoop.tmp.dir</name>
+	<value>file:/usr/local/hadoop/tmp</value>
+	<description>Abase for other temporary directories.</description>
+    </property>
+    <property>
+	<name>fs.defaultFS</name>
+	<value>hdfs://localhost:9000</value>
+    </property>
 ```
 
 ### 2.5.3 修改配置文件hdfs-site.xml
 + vim /usr/local/hadoop/etc/hadoop/hdfs-site.xml
 + 在`<configuration>`标签中插入以下内容：
 ```
-	<property>
-		<name>dfs.replication</name>
-		<value>1</value>
-	</property>
-	<property>
-		<name>dfs.namenode.name.dir</name>
-		<value>file:/usr/local/hadoop/tmp/dfs/name</value>
-	</property>
-	<property>
-		<name>dfs.datanode.data.dir</name>
-		<value>file:/usr/local/hadoop/tmp/dfs/data</value>
-	</property>
+    <property>
+	<name>dfs.replication</name>
+	<value>1</value>
+    </property>
+    <property>
+	<name>dfs.namenode.name.dir</name>
+	<value>file:/usr/local/hadoop/tmp/dfs/name</value>
+    </property>
+    <property>
+	<name>dfs.datanode.data.dir</name>
+	<value>file:/usr/local/hadoop/tmp/dfs/data</value>
+    </property>
 ```
 
 ### 2.5.4 执行 NameNode 的格式化
