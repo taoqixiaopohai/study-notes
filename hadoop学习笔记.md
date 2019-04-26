@@ -50,33 +50,33 @@ export PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin
 + vim /usr/local/hadoop/etc/hadoop/core-site.xml
 + 在`<configuration>`标签中插入以下内容：
 ```
-    <property>
-	<name>hadoop.tmp.dir</name>
-	<value>file:/usr/local/hadoop/tmp</value>
-	<description>Abase for other temporary directories.</description>
-    </property>
-    <property>
-	<name>fs.defaultFS</name>
-	<value>hdfs://localhost:9000</value>
-    </property>
+<property>
+    <name>hadoop.tmp.dir</name>
+    <value>file:/usr/local/hadoop/tmp</value>
+    <description>Abase for other temporary directories.</description>
+</property>
+<property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://localhost:9000</value>
+</property>
 ```
 
 ### 2.5.3 修改配置文件hdfs-site.xml
 + vim /usr/local/hadoop/etc/hadoop/hdfs-site.xml
 + 在`<configuration>`标签中插入以下内容：
 ```
-    <property>
-	<name>dfs.replication</name>
-	<value>1</value>
-    </property>
-    <property>
-	<name>dfs.namenode.name.dir</name>
-	<value>file:/usr/local/hadoop/tmp/dfs/name</value>
-    </property>
-    <property>
-	<name>dfs.datanode.data.dir</name>
-	<value>file:/usr/local/hadoop/tmp/dfs/data</value>
-    </property>
+<property>
+    <name>dfs.replication</name>
+    <value>1</value>
+</property>
+<property>
+    <name>dfs.namenode.name.dir</name>
+    <value>file:/usr/local/hadoop/tmp/dfs/name</value>
+</property>
+<property>
+    <name>dfs.datanode.data.dir</name>
+    <value>file:/usr/local/hadoop/tmp/dfs/data</value>
+</property>
 ```
 
 ### 2.5.4 执行 NameNode 的格式化
