@@ -48,7 +48,7 @@ export  JAVA_HOME=jdk安装路径
 
 ### 2.5.2修改配置文件core-site.xml
 + vim /usr/local/hadoop/etc/hadoop/core-site.xml
-+ 在<configuration>标签中插入以下内容：
++ 在`<configuration>`标签中插入以下内容：
 ```
 	<property>
 		<name>hadoop.tmp.dir</name>
@@ -63,7 +63,7 @@ export  JAVA_HOME=jdk安装路径
 
 ### 2.5.3 修改配置文件hdfs-site.xml
 + vim /usr/local/hadoop/etc/hadoop/hdfs-site.xml
-+ 在<configuration>标签中插入以下内容：
++ 在`<configuration>`标签中插入以下内容：
 ```
 	<property>
 		<name>dfs.replication</name>
