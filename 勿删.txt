@@ -119,5 +119,3 @@
 	mvn install:install-file -Dfile= -DgroupId= -DartifactId= -Dversion= -Dpackaging=jar
 	如：
 	mvn install:install-file -Dfile=E:\linkCM\tools\maven\repository\com\linkcm\typhoon-api-1.0.jar -DgroupId=com.linkcm -DartifactId=typhoon-api -Dversion=1.0 -Dpackaging=jar
-
-
