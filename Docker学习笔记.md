@@ -20,7 +20,7 @@
 
 # 4 常用docker容器启动示例
 ## 4.1 启动postgresql容器(使用集成了postgis的镜像)
-+ 启动命令：docker run --name postgresql -d -p 5432:5432 -v /root/Docker/postgresql/data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=pg123 -e POSTGRES_USER=postgres mdillon/postgis
++ 启动命令：docker run --name postgres -d -p 5432:5432 -e POSTGRES_USER=sonar -e POSTGRES_PASSWORD=sonar -e POSTGRES_DB=sonar -v /mnt/docker/container/postgres/data/:/var/lib/postgresql/data postgres
 + 启动参数释义：
 
 	--name 指定容器名称
@@ -28,6 +28,8 @@
 	-p 端口映射，冒号前为宿主机端口，冒号后为容器端口
 
 	-v 挂载容器目录到宿主机目录，冒号前为宿主机目录，冒号后为容器目录
+	
+	-e 设置容器环境变量
 
 	-d 容器在后台运行
 
@@ -68,6 +70,12 @@
 
 ## 4.7 启动elasticsearch插件elasticsearch-head
 + 启动命令：docker run -d --name es-head -p 9100:9100 -v /root/Docker/elasticsearch-head/Gruntfile.js:/usr/src/app/Gruntfile.js -v /root/Docker/elasticsearch-head/app.js:/usr/src/app/_site/app.js mobz/elasticsearch-head:5
+
+## 4.8 启动sonarqube容器
++ 启动命令：docker run --name sonarqube -d -p 9000:9000 --link postgres -e sonar.jdbc.username=sonar -e sonar.jdbc.password=sonar -e sonar.jdbc.url=jdbc:postgresql://postgres:5432/sonar -v /mnt/docker/container/sonarqube/conf/:/opt/sonarqube/conf -v /mnt/docker/container/sonarqube/data:/opt/sonarqube/data -v /mnt/docker/container/sonarqube/logs:/opt/sonarqube/logs -v /mnt/docker/container/sonarqube/temp/:/opt/sonarqube/temp -v /mnt/docker/container/sonarqube/extensions/:/opt/sonarqube/extensions  sonarqube
++ 注意：
+
+	--link es:elasticsearch 中的es为已启动的elasticsearch容器的名称
 
 # 5 进入docker容器内部
 + 命令：docker exec -it 775c7c9ee1e1 /bin/bash
