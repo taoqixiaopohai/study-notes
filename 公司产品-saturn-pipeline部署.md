@@ -24,11 +24,13 @@
 `docker build -t saturn-db:latest .`
 
 ## 2.4 启动saturn-db容器
-`docker run -d --name saturn-db -p 3306:3306  -e MYSQL_ROOT_PASSWORD=root saturn-db`
+`docker run -d --name saturn-db -p 3306:3306 -v /mnt/docker/container/saturn-db/mysql/config/conf.d:/etc/mysql/conf.d -v /mnt/docker/container/saturn-db/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root saturn-db`
 
 ## 2.5 验证mysql启动成功
 利用mysql相关信息登录，看到saturn_console数据库，如下图所示，即安装成功
 ![msyql启动成功](./resources/image/saturn-pipeline/mysql启动成功.png "mysql启动成功")
+*** 如果成功连接了数据库服务，但是没有saturn_console数据库，则手动执行下saturn-console.sql即可。***
+
 
 # 3 安装saturn-console
 
